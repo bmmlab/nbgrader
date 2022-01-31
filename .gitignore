@@ -120,3 +120,6 @@ package-lock.json
 .goutputstream*
 .idea
 .mypy_cache
+
+# Pyenv stuff
+.python-version
