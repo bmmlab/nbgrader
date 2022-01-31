@@ -5,8 +5,9 @@ define([
     'base/js/namespace',
     'jquery',
     'base/js/utils',
+    'base/js/i18n',
     'base/js/dialog',
-], function(Jupyter, $, utils, dialog) {
+], function(Jupyter, $, utils, i18n, dialog) {
     "use strict";
 
     var ajax = utils.ajax || $.ajax;
@@ -436,36 +437,59 @@ define([
         } else if (this.data.status == 'fetched') {
             button.text("Submit");
             button.click(function (e) {
-                var settings = {
-                    cache : false,
-                    data : {
-                        course_id: that.data.course_id,
-                        assignment_id: that.data.assignment_id
-                    },
-                    type : "POST",
-                    dataType : "json",
-                    success : function (data, status, xhr) {
-                        if (!data.success) {
-                            that.submit_error(data);
-                            button.text('Submit');
-                            button.removeAttr('disabled');
-                        } else {
-                            that.on_refresh(data, status, xhr);
+                dialog.modal({
+                    title: i18n.msg._('Submit Assignment'),
+                    body: i18n.msg.sprintf("Do you want to continue with submitting your '%s'?", that.data.assignment_id),
+                    default_button: 'Cancel',
+                    buttons: {
+                        Cancel: {
+                            class: 'btn-default'
+                        },
+                        Submit: {
+                            class: "btn-primary",
+                            click: function () {
+                                var settings = {
+                                    cache: false,
+                                    data: {
+                                        course_id: that.data.course_id,
+                                        assignment_id: that.data.assignment_id
+                                    },
+                                    type: 'POST',
+                                    dataType: 'json',
+                                    success: function (data, status, xhr) {
+                                        if (!data.success) {
+                                            that.submit_error(data);
+                                            button.text('Submit');
+                                            button.removeAttr('disabled');
+                                        } else {
+                                            that.on_refresh(data, status, xhr);
+                                            dialog.modal({
+                                                title: i18n.msg._('Assignment Submitted'),
+                                                body: i18n.msg.sprintf("Your '%s' was submitted successfully.", that.data.assignment_id),
+                                                buttons: {
+                                                    OK: {class: 'btn-success'}
+                                                }
+                                            });
+                                        }
+                                    },
+                                    error: function (xhr, status, error) {
+                                        container.empty().text("Error submitting assignment.");
+                                        utils.log_ajax_error(xhr, status, error);
+                                    }
+                                };
+
+                                button.text('Submitting...');
+                                button.attr('disabled', 'disabled');
+                                var url = utils.url_path_join(
+                                    that.base_url,
+                                    'assignments',
+                                    'submit'
+                                );
+                                ajax(url, settings);
+                            }
                         }
-                    },
-                    error : function (xhr, status, error) {
-                        container.empty().text("Error submitting assignment.");
-                        utils.log_ajax_error(xhr, status, error);
                     }
-                };
-                button.text('Submitting...');
-                button.attr('disabled', 'disabled');
-                var url = utils.url_path_join(
-                    that.base_url,
-                    'assignments',
-                    'submit'
-                );
-                ajax(url, settings);
+                });
             });
 
         } else if (this.data.status == 'submitted') {
