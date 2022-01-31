@@ -101,7 +101,7 @@ var AssignmentUI = Backbone.View.extend({
         var name = this.model.get("name")
         this.$name.attr("data-order", name);
         this.$name.append($("<a/>")
-            .attr("target", "_blank")
+            .attr("target", "_top")
             .attr("href", base_url + "/tree/" + url_prefix + "/" + this.model.get("source_path"))
             .text(name));
 
@@ -145,7 +145,7 @@ var AssignmentUI = Backbone.View.extend({
         var release_path = this.model.get("release_path");
         if (release_path) {
             this.$preview.append($("<a/>")
-                .attr("target", "_blank")
+                .attr("target", "_top")
                 .attr("href", base_url + "/tree/" + url_prefix + "/" + release_path)
                 .append($("<span/>")
                     .addClass("glyphicon glyphicon-search")

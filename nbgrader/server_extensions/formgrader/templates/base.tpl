@@ -1,6 +1,8 @@
 <!doctype html>
 <head>
-  <title>nbgrader formgrade</title>
+  <title>
+    {{ course_id.upper() }} - {% block title -%} Grading {%- endblock %}
+  </title>
 
   <script src="{{ base_url }}/formgrader/static/components/jquery/jquery.min.js"></script>
   <script src="{{ base_url }}/formgrader/static/components/underscore/underscore-min.js"></script>
@@ -26,18 +28,17 @@
 <body>
   <div class="container-fluid">
     <div class="row">
-      <div class="col-md-2">
-        <div class="page-header">
-          <h1>nbgrader</h1>
+      <div class="col-md-12">
+        <div class="h4">
+          <p class="">{{ course_id.upper() }}</p>
         </div>
       </div>
+
+      {# Hidden Block #}
+      {% if false %}
       <div class="col-md-8">
-        <div class="page-header">
-          <h1>
-          {%- block title -%}
-          {%- endblock -%}
-          </h1>
-        </div>
+        <div class="">
+        <p class="lead">{{ self.title() }}</p>
       </div>
       <div class="col-md-2">
         <div class="pull-right jupyter-logo">
@@ -70,7 +71,10 @@
           </svg>
         </div>
       </div>
+      {% endif %}
+      {# End Hidden Block #}
     </div>
+
     <div class="row">
       <div class="col-md-2">
         <ul class="nav nav-pills nav-stacked">
