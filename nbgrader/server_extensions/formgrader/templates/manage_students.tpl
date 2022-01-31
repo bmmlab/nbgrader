@@ -27,8 +27,10 @@
 {%- block table_footer -%}
 <tr>
   <td colspan="5">
+  {%- if is_coordinator -%}
     <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
     <a href="#" onClick="createStudentModal();">Add new student...</a>
+  {%- endif -%}
   </td>
 </tr>
 {%- endblock -%}

@@ -13,14 +13,17 @@ class ManageAssignmentsHandler(BaseHandler):
     @check_xsrf
     @check_notebook_dir
     def get(self):
-        html = self.render(
-            "manage_assignments.tpl",
-            url_prefix=self.url_prefix,
-            base_url=self.base_url,
-            windows=(sys.prefix == 'win32'),
-            course_id=self.api.course_id,
-            exchange=self.api.exchange_root,
-            exchange_missing=self.api.exchange_missing)
+        if not self.is_course_coordinator:
+            self.redirect(f"{self.base_url}/formgrader/gradebook", permanent=False)
+        else:
+            html = self.render(
+                "manage_assignments.tpl",
+                url_prefix=self.url_prefix,
+                base_url=self.base_url,
+                windows=(sys.prefix == 'win32'),
+                course_id=self.api.course_id,
+                exchange=self.api.exchange_root,
+                exchange_missing=self.api.exchange_missing)
         self.write(html)
 
 

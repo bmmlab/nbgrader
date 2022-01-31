@@ -79,7 +79,9 @@
       <div class="col-md-2">
         <ul class="nav nav-pills nav-stacked">
           {%- block sidebar -%}
-          <li role="presentation"><a href="{{ base_url }}/formgrader/manage_assignments">Manage Assignments</a></li>
+          {%- if is_coordinator -%}
+            <li role="presentation"><a href="{{ base_url }}/formgrader/manage_assignments">Manage Assignments</a></li>
+          {%- endif -%}
           <li role="presentation"><a href="{{ base_url }}/formgrader/gradebook">Gradebook</a></li>
           <li role="presentation"><a href="{{ base_url }}/formgrader/manage_students">Manage Students</a></li>
           {%- endblock -%}

@@ -55,8 +55,22 @@ class BaseHandler(IPythonHandler):
         api.log_level = level
         return api
 
+    @property
+    def is_course_coordinator(self) -> bool:
+        user_name = self.get_current_user()['name']
+        coordinators = self.coursedir.course_coordinators
+        return user_name in coordinators
+
     def render(self, name, **ns):
         template = self.settings['nbgrader_jinja2_env'].get_template(name)
+        if not ns:
+            ns = {}
+        ns.update(
+            base_url=self.base_url,
+            course_id=self.coursedir.course_id,
+            is_coordinator=self.is_course_coordinator,
+        )
+        self.log.debug(f"RENDER NS: {ns}")
         return template.render(**ns)
 
     def write_error(self, status_code, **kwargs):

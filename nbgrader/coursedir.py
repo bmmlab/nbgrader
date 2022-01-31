@@ -268,6 +268,16 @@ class CourseDirectory(LoggingConfigurable):
         )
     ).tag(config=True)
 
+    course_coordinators = List(
+        help=dedent(
+            """
+            List of course coordinators.
+            These users must exist on the server and will be those who will
+            have access to the ManageAssignments app.
+            """
+        )
+    ).tag(config=True)
+
     max_file_size = Integer(
         100000,
         help=dedent(
