@@ -28,6 +28,7 @@ define([
     CellToolbar._global_hide = CellToolbar.global_hide;
     CellToolbar.global_hide = function () {
         $("#nbgrader-total-points-group").hide();
+        $("#nbgrader-regen-cell-ids-group").hide();
 
         CellToolbar._global_hide();
         for (var i=0; i < CellToolbar._instances.length; i++) {
@@ -40,22 +41,55 @@ define([
         validate_schema_version();
         clear_cell_types();
 
+        var $maintoolbar = $("#maintoolbar-container");
         var elem = $("#nbgrader-total-points-group");
+        var $regen_elem = $("#nbgrader-regen-cell-ids-group");
         if (preset.name === nbgrader_preset_name) {
             if (elem.length == 0) {
-                elem = $("<div />").attr("id", "nbgrader-total-points-group");
-                elem.addClass("btn-group");
+                elem = $("<div />").addClass("btn-group").attr("id", "nbgrader-total-points-group");
                 elem.append($("<span />").text("Total points:"));
                 elem.append($("<input />")
                             .attr("disabled", "disabled")
                             .attr("type", "number")
                             .attr("id", "nbgrader-total-points"));
-                $("#maintoolbar-container").append(elem);
+                $maintoolbar.append(elem);
             }
             elem.show();
             update_total();
+
+            if ($regen_elem.length === 0) {
+                $regen_elem = $("<div />").addClass("btn-group").attr("id", "nbgrader-regen-cell-ids-group");
+                var $btn = $("<button />").attr("class", "btn btn-default regen-cell-ids");
+                $btn.append($("<span />").addClass("toolbar-btn-label").text("Cell IDs"));
+                $btn.append($("<i />").addClass("fa-refresh fa toolbar-btn-label"));
+                $regen_elem.append($btn);
+                $maintoolbar.append($regen_elem);
+
+                // Attach click event listener/action
+                $btn.click(function () {
+                    $btn.attr("disabled", "disabled");
+                    var cells = Jupyter.notebook.get_cells();
+                    for (var i = 0; i < cells.length; i++) {
+                        var cell = cells[i];
+                        var $inputs = $(cell.celltoolbar.inner_element).find(".nbgrader-id-input");
+                        if ($inputs.length > 0) {
+                            cell.metadata.nbgrader.grade_id = undefined; // Clear current grade_id
+                            set_grade_id(cell, get_grade_id(cell)); // Generate and set new grade_id
+
+                            var $input = $($inputs[0]);
+                            $input.attr("value", get_grade_id(cell));
+                        }
+                    }
+                    var p = Jupyter.notebook.save_notebook(); // Now save it
+                    p.then(function () {
+                        $btn.removeAttr("disabled");
+                    });
+                });
+            }
+            $regen_elem.show();
         } else {
             elem.hide();
+            $regen_elem.hide();
         }
     });
 
